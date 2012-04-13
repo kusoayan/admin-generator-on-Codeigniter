@@ -22,7 +22,7 @@ abstract class EXMY_Model extends MY_Model
 
     protected function _getTableName()
     {
-        return strtolower(trim(get_class($this),"_model"));
+        return strtolower(substr(get_class($this),0,-6));
     }
 
     protected function _set($data = array())
@@ -44,9 +44,7 @@ abstract class EXMY_Model extends MY_Model
 
     protected function _where($where = NULL)
     {
-        if ($where == NULL)
-            $this->db->where("id", $this->id->get());
-        else
+        if ($where != NULL)
         {
             foreach ($where as $key => $val)
             {
@@ -60,54 +58,130 @@ abstract class EXMY_Model extends MY_Model
         return get_object_vars($this);
     }
 
-    public function add($data = NULL)
+    public function add($data = NULL, $table = NULL)
     {
         if($this->id->get() == NULL)
         {
-            if($data != NULL)
-                $this->_set($data);
+            if ($table == NULL)
+            {
+                $model_obj = $this;   
+            }
+            else
+            {
+                $this->load->model($table . "_model");
+                $model_obj = $this->{$table . "_model"};
+            }
+
+            if ($data != NULL)
+                $model_obj->_set($data);
 
             $data = array();
-            $fields = $this->getAllFields();
+            $fields = $model_obj->getAllFields();
             foreach ($fields as $field => $val)
             {
                 $data[$field] = $val->get();
                 $val->set(NULL);
             }
-            $this->db->insert($this->_getTableName(),$data);
+            $this->db->insert($model_obj->_getTableName(),$data);
         }
     }
 
-    public function save($data = NULL,$where = NULL)
+    public function save($data = NULL, $where = NULL, $table = NULL)
     {
-        if($this->id->get() > 0)
+        if ($table == NULL)
         {
-            if($data != NULL)
-                $this->_set($data);
-
-            $fields = $this->getAllFields();
-            foreach ($fields as $field => $val)
-            {
-                $data[$field] = $val->get();
-            }
-            $this->_where($where);
-            $this->db->update($this->_getTableName(),$data);
-            print_r($data);
+            $model_obj = $this;   
         }
+        else
+        {
+            $this->load->model($table . "_model");
+            $model_obj = $this->{$table . "_model"};
+        }
+
+        if (!is_array($where))
+        {
+            $model_obj->id->set((int) ($where));
+        }
+        else
+        {
+            $model_obj->_where($where);
+        }
+
+        if($data != NULL)
+            $model_obj->_set($data);
+
+        $fields = $model_obj->getAllFields();
+        foreach ($fields as $field => $val)
+        {
+            $data[$field] = $val->get();
+        }
+
+        $this->db->update($model_obj->_getTableName(),$data);
 
     }
 
-    public function del($where = NULL)
+    public function del($where = NULL, $table = NULL)
     {
-        if (is_int($where))
+        if ($table == NULL)
         {
-            $this->_where(array("id" => $where));
+            $model_obj = $this;   
+        }
+        else
+        {
+            $this->load->model($table . "_model");
+            $model_obj = $this->{$table . "_model"};
+        }
+
+        if (!is_array($where))
+        {
+            $model_obj->_where(array("id" => (int) ($where)));
+        }
+        else
+        {
+            $model_obj->_where($where);
+        }
+
+        $this->db->delete($model_obj->_getTableName());
+    }
+
+    public function get_list($where = NULL, $offset = 0, $limit = 1000, $table = NULL)
+    {
+        if ($table == NULL)
+        {
+            $model_obj = $this;   
+        }
+        else
+        {
+            $this->load->model($table . "_model");
+            $model_obj = $this->{$table . "_model"};
+        }
+
+        if (!is_array($where) && $where != NULL)
+        {
+            $model_obj->_where(array("id" => (int) ($where)));
         }
         else
         {
             $this->_where($where);
         }
-        $this->db->delete($this->_getTableName());
+
+        $query = $this->db->get($model_obj->_getTableName(),$limit,$offset);
+
+        if ($query->num_rows > 0)
+        {
+            return $query->result_array();
+        }
+        else
+        {
+            return FALSE;
+        }
+
+    }
+
+    public function get($where = NULL, $table = NULL)
+    {
+        $result = $this->get_list($where,0,1,$table);
+        return $result[0];
     }
 
 }

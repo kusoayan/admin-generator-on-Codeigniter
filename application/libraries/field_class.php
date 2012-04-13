@@ -21,6 +21,7 @@ class OriginField
     protected $_maxlength;
     protected $_minlength;
     protected $_value;
+    protected $_foreign_key = array();
 
     function __construct($config = array())
     {
@@ -44,6 +45,10 @@ class OriginField
                         $this->_minlength = $value;
                         break;   
 
+                    case 'ForeignKey':
+                        $this->_foreign_key = explode("-",$value);
+                        break;
+
                     default:
                         break;
                 }
@@ -57,6 +62,18 @@ class OriginField
         return $this->_field_setting;
     }
 
+    public function getForeignKey()
+    {
+        if ($this->_foreign_key == array())
+        {
+            return NULL;
+        }
+        else
+        {
+            return $this->_foreign_key;
+        }
+    }
+
     public function get()
     {
         return $this->_value;
@@ -64,7 +81,7 @@ class OriginField
 
     public function set($data = NULL, &$err_msg = NULL)
     {
-        if($this->validation($data, $err_msg) == TRUE)
+        if($this->_validation($data, $err_msg) == TRUE)
         {
             $this->_value = $data;
             return TRUE;
@@ -73,7 +90,8 @@ class OriginField
             return FALSE;
     }
 
-    protected function validation($data = NULL, &$err_msg)
+
+    protected function _validation($data = NULL, &$err_msg)
     {
         $ci =& get_instance();
         $ci->load->library("form_validation");
@@ -131,6 +149,12 @@ class IntField extends OriginField
                 $this->_field_setting["unsigned"] = TRUE;
                 $this->_field_setting["auto_increment"] = TRUE;
             }
+        }
+
+        if(array_key_exists("ForeignKey",$config))
+        {
+            $this->_field_setting["constraint"] = 11;
+            $this->_field_setting["unsigned"] = TRUE;
         }
     }
 }

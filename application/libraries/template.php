@@ -80,6 +80,7 @@ class Template {
     public function __construct($config = array())
     {
         $this->_ci = get_instance();
+        $this->_ci->load->helper("html");
 
         log_message('debug', 'Tempalte Class Initialized');
 
@@ -268,8 +269,9 @@ class Template {
      * @param Boolean $return
      * @return string
      */
-    public function render($view, $data = $_data , $return = FALSE)
+    public function render($view, $return = FALSE)
     {
+        $data = $this->_data;
         $this->set('meta_tag', implode("\r\n", $this->_meta_tags) . "\r\n");
         $this->set('styles', implode("\r\n", $this->_styles) . "\r\n");
         $this->set('scripts_header', implode("\r\n", $this->_scripts_header) . "\r\n");

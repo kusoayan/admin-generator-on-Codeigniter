@@ -76,7 +76,6 @@ class Admin_generator {
                     $this->_ci->db->query($sql);
                 }
             }
-            
         }
         
     }
