@@ -23,7 +23,8 @@
 		</ul>
 	</div>
     <div id="submenu">
-        <a href="">haha</a>
+        <a href="<?="<?=site_url(\"admin/{$model}/edit_item\");?>";?>">Add</a>
+        <a href="<?="<?=site_url(\"admin/{$model}/list_item\");?>";?>">List</a>
     </div>
 
 	<div id="content">

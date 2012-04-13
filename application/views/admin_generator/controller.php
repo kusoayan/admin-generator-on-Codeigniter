@@ -17,7 +17,7 @@ class <?=ucfirst($model_name);?> extends MY_Controller {
     {
         $this->template->set("items",$this->self_model->get_list());
         $this->template->set("edit_controller","admin/<?=$model_name;?>/edit_item/");
-        $this->template->set("del_controller","");
+        $this->template->set("del_controller","admin/<?=$model_name;?>/del_item/");
         $this->template->render("admin/<?=$model_name;?>/<?=$model_name;?>_list");
     }
 
@@ -28,7 +28,15 @@ class <?=ucfirst($model_name);?> extends MY_Controller {
 <?php foreach ($display_field as $field):?>
             $data["<?=$field;?>"] = $this->input->post("<?=$field;?>");
 <?php endforeach;?>
-            $this->self_model->save($data,$id);
+            if ($id > 0)
+            {
+                $this->self_model->save($data,$id);
+            }
+            else
+            {
+                $this->self_model->add($data);
+                redirect("admin/<?=$model_name;?>/list_item");
+            }
         }
 
         if ($id > 0)
@@ -41,6 +49,15 @@ class <?=ucfirst($model_name);?> extends MY_Controller {
         $this->template->set("edit_controller","admin/<?=$model_name;?>/edit_item/");
         $this->template->render("admin/<?=$model_name;?>/<?=$model_name;?>_edit");
         
+    }
+
+    public function del_item($id = NULL)
+    {
+        if ($id > 0)
+        {
+            $this->self_model->del($id);
+        }
+        redirect("admin/<?=$model_name;?>/list_item");
     }
 
 }
