@@ -49,8 +49,10 @@ class Admin_generator {
                 $temp[$field] = $this->_ci->{$model . "_model"}->$field->getFieldSetting();
                 if ($this->_ci->{$model . "_model"}->$field->getForeignKey() != NULL)
                 {
-                    $foreign_key_array[0] = $field;
-                    $foreign_key_array[1] = $this->_ci->{$model . "_model"}->$field->getForeignKey();
+                    $foreign_key_array[] = array(
+                        $field,
+                        $this->_ci->{$model . "_model"}->$field->getForeignKey()
+                    );
                     $this->_ci->dbforge->add_key($field);
                 }
             }
@@ -69,11 +71,14 @@ class Admin_generator {
                 $this->_ci->load->database();
                 if ($this->_ci->db->table_exists($table_name))
                 {
-                    $sql = "ALTER TABLE  `{$table_name}` 
-                        ADD FOREIGN KEY ( `{$foreign_key_array[0]}` )
-                        REFERENCES  `{$foreign_key_array[1][0]}` (`{$foreign_key_array[1][1]}`)
-                        ON DELETE CASCADE ON UPDATE CASCADE ;";
-                    $this->_ci->db->query($sql);
+                    foreach ($foreign_key_array as $val)
+                    {
+                        $sql = "ALTER TABLE  `{$table_name}` 
+                            ADD FOREIGN KEY ( `{$val[0]}` )
+                            REFERENCES  `{$val[1][0]}` (`{$val[1][1]}`)
+                            ON DELETE CASCADE ON UPDATE CASCADE ;";
+                        $this->_ci->db->query($sql);
+                    }
                 }
             }
         }

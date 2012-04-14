@@ -3,6 +3,8 @@
 <?php foreach ($display_field as $field):?>
         <th width="30%"><?=$field;?></th>
 <?php endforeach;?>
+        <th width="10%">Edit</th>
+        <th width="10%">Delete</th>
     </tr>
     <?="<?php ";?>if (v($items)):
             foreach($items as $item):?>

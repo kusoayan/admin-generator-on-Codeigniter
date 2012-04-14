@@ -6,6 +6,9 @@ class <?=ucfirst($model_name);?> extends MY_Controller {
     {
         parent::__construct();
         $this->template->set_layout("admin/template/admin_layout.php");
+        $this->template->set("this_model","<?=$model_name;?>");
+        $this->template->set("edit_controller","admin/<?=$model_name;?>/edit_item/");
+        $this->template->set("del_controller","admin/<?=$model_name;?>/del_item/");
         $this->load->model("<?=$model_name;?>_model","self_model");
     }
 	public function index()
@@ -16,8 +19,6 @@ class <?=ucfirst($model_name);?> extends MY_Controller {
     public function list_item()
     {
         $this->template->set("items",$this->self_model->get_list());
-        $this->template->set("edit_controller","admin/<?=$model_name;?>/edit_item/");
-        $this->template->set("del_controller","admin/<?=$model_name;?>/del_item/");
         $this->template->render("admin/<?=$model_name;?>/<?=$model_name;?>_list");
     }
 
