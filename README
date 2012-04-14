@@ -8,3 +8,14 @@ if you hava any suggestion:
     create an issue
 
 Thanks!
+
+usage:
+
+1. create your model in application/models/ with name xxxx_model.php
+    (e.g. news_model, user_detail_model)
+
+2. declared the field in model, you can see an example in application/models/news_model.php
+
+3. add the model to model_list in the config: admin_generator.php
+
+4. add the admin_generator's method to any controller you want, you can see the example in the application/controllers/welcome.php
